@@ -260,7 +260,7 @@ function App() {
           if (nextIndex >= views.current.length) {
             clearInterval(interval);
             // After text fades out (15s) + 1s delay = 16s after view starts
-            setTimeout(() => setShowNewButton(true), 1000); // 1 second after text fades out
+            setTimeout(() => setShowNewButton(true), 500); // 1 second after text fades out
             return prevIndex; // Stay on the last view
           }
           // Activate text overlay for the new view
@@ -269,11 +269,11 @@ function App() {
           clearTimeout(fadeOutTimeout);
           fadeOutTimeout = window.setTimeout(
             () => setTextOverlayActive(false),
-            15000,
+            20000,
           ); // Fade out 5 seconds before next switch
           return nextIndex;
-        });
-      }, 20000); // 20 seconds
+        }); 
+      }, 25000); // 增加切换间隔从20秒到25秒，给相机更多时间完成平滑过渡
     };
 
     // Start auto-switching immediately
@@ -390,6 +390,9 @@ function App() {
               opacity: showNewButton ? 1 : 0,
               boxShadow: "none",
               fontSize: "18px",
+              display: "flex",
+              alignItems: "center",
+              gap: "10px",
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.backgroundColor = "rgba(255, 255, 255, 0.5)";
@@ -400,6 +403,14 @@ function App() {
               e.currentTarget.style.boxShadow = "none";
             }}
           >
+            <img 
+              src="/src/assets/logoicon.png" 
+              alt="Logo" 
+              style={{
+                width: "36px",
+                height: "36px",
+              }}
+            />
             Look4ti，一起寻找金银岛
           </button>
         </div>
@@ -477,6 +488,7 @@ function App() {
             body={viewTexts.current[currentViewIndex].body}
             isActive={textOverlayActive}
             fadeDuration={3000} // 3 seconds fade out
+            typewriterSpeed={100} // 100ms per character for 5-second total duration
             offsetX={currentViewIndex === 0 ? "1000px" : "0px"}
           />
         </Suspense>

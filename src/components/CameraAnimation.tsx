@@ -40,8 +40,12 @@ export function CameraAnimation({ targetPosition, targetLookAt, onAnimationCompl
     if (!isAnimating.current) return;
 
     const currentPos = camera.position;
-    lerpFactor.current = Math.min(lerpFactor.current + delta * 0.8, 1);
-    const t = 1 - Math.pow(1 - lerpFactor.current, 2);
+    // 使用更平滑的插值速度和缓动函数
+    lerpFactor.current = Math.min(lerpFactor.current + delta * 0.6, 1); // 减慢速度从0.8到0.6
+    // 使用ease-in-out缓动函数，开始慢，中间快，结束慢
+    const t = lerpFactor.current < 0.5 
+      ? 2 * lerpFactor.current * lerpFactor.current 
+      : 1 - Math.pow(-2 * lerpFactor.current + 2, 2) / 2;
     
     if (animationPhase.current === 1) {
       // 第一阶段：移动到中间位置

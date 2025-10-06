@@ -89,7 +89,8 @@ function Model({ onInfoUpdate, onTransform }: {
 
   useFrame((state, delta) => {
     if (mixer.current) {
-      mixer.current.update(delta);
+      // 使用更平滑的动画更新，减少突然的动作变化
+      mixer.current.update(delta * 0.8); // 减慢动画播放速度
     }
     if (modelRef.current) {
       const newModelInfo = {
@@ -102,25 +103,12 @@ function Model({ onInfoUpdate, onTransform }: {
           !newModelInfo.rotation.equals(lastModelInfo.current.rotation) ||
           !newModelInfo.scale.equals(lastModelInfo.current.scale)) {
         
-        console.log('Model Update:', {
-          position: {
-            x: newModelInfo.position.x.toFixed(3),
-            y: newModelInfo.position.y.toFixed(3),
-            z: newModelInfo.position.z.toFixed(3)
-          },
-          rotation: {
-            x: (newModelInfo.rotation.x * 180 / Math.PI).toFixed(3),
-            y: (newModelInfo.rotation.y * 180 / Math.PI).toFixed(3),
-            z: (newModelInfo.rotation.z * 180 / Math.PI).toFixed(3)
-          },
-          scale: {
-            x: newModelInfo.scale.x.toFixed(3),
-            y: newModelInfo.scale.y.toFixed(3),
-            z: newModelInfo.scale.z.toFixed(3)
-          }
-        });
-
-        lastModelInfo.current = newModelInfo;
+        // 移除控制台日志以减少性能影响
+        lastModelInfo.current = {
+          position: newModelInfo.position.clone(),
+          rotation: new Euler().copy(newModelInfo.rotation),
+          scale: newModelInfo.scale.clone()
+        };
         onInfoUpdate(newModelInfo);
       }
     }
@@ -216,7 +204,10 @@ export function SceneInfo({ onCameraTargetChange }: SceneInfoProps) {
   
   useFrame((state, delta) => {
     if (camera instanceof THREE.PerspectiveCamera) {
-      const t = Math.min(delta * 2, 1);
+      // 使用更平滑的缓动函数，减慢插值速度并添加缓动效果
+      const rawT = Math.min(delta * 1.2, 1); // 减慢速度从2到1.2
+      // 使用ease-out缓动函数，开始快，结束慢
+      const t = 1 - Math.pow(1 - rawT, 3);
       
       const newPosition = lerpVector3(
         camera.position,
