@@ -23,7 +23,6 @@ export const TextOverlay: React.FC<TextOverlayProps> = ({
   const [opacity, setOpacity] = useState(0);
   const titleIndex = useRef(0);
   const bodyIndex = useRef(0);
-  const typewriterTimeout = useRef<number | undefined>(undefined);
 
   useEffect(() => {
     let initialDelayTimeout: number | undefined;

@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { useThree, useFrame } from "@react-three/fiber";
 import { OrbitControls, useGLTF } from "@react-three/drei";
 import { Suspense, useEffect, useRef, useState, useCallback } from "react";
-import { Vector3, Euler, Group, Color, PerspectiveCamera } from "three";
+import { Vector3, Euler, Group } from "three";
 
 interface ModelInfo {
   position: Vector3;
@@ -20,10 +20,10 @@ interface SceneInfoProps {
   onCameraTargetChange?: (position: Vector3, lookAt: Vector3) => void;
 }
 
-function Model({ onInfoUpdate, onTransform }: { 
+function Model({ onInfoUpdate }: { 
   onInfoUpdate: (info: ModelInfo) => void;
-  onTransform: (position: [number, number, number], scale: [number, number, number], rotation: Partial<{ x: number, y: number, z: number }>) => void;
 }) {
+  const { camera } = useThree();
   const [loadingError, setLoadingError] = useState<string | null>(null);
   const modelRef = useRef<Group>(null);
   const mixer = useRef<THREE.AnimationMixer | null>(null);
@@ -35,9 +35,9 @@ function Model({ onInfoUpdate, onTransform }: {
 
   const { scene, animations } = useGLTF("/models/spaceship.glb", true, 
     undefined,
-    (error) => {
+    (error: unknown) => {
       console.error('GLTF loading error:', error);
-      setLoadingError(error.message);
+      setLoadingError(error instanceof Error ? error.message : String(error));
     }
   );
 
@@ -76,18 +76,9 @@ function Model({ onInfoUpdate, onTransform }: {
     };
   }, [scene, animations]);
 
-  const handlePointerMove = useCallback(() => {
-    if (modelRef.current) {
-      const newModelInfo = {
-        position: modelRef.current.position.clone(),
-        rotation: modelRef.current.rotation.clone(),
-        scale: modelRef.current.scale.clone()
-      };
-      onInfoUpdate(newModelInfo);
-    }
-  }, [onInfoUpdate]);
+  // 已移除未使用的指针移动处理逻辑
 
-  useFrame((state, delta) => {
+  useFrame((_state, delta) => {
     if (mixer.current) {
       // 使用更平滑的动画更新，减少突然的动作变化
       mixer.current.update(delta * 0.8); // 减慢动画播放速度
@@ -114,19 +105,9 @@ function Model({ onInfoUpdate, onTransform }: {
     }
   });
 
-  const transformModel = useCallback((position: [number, number, number], scale: [number, number, number], rotation: Partial<{ x: number, y: number, z: number }>) => {
-    if (scene) {
-      scene.position.set(...position);
-      scene.scale.set(...scale);
-      if (rotation.x !== undefined) scene.rotation.x = rotation.x;
-      if (rotation.y !== undefined) scene.rotation.y = rotation.y;
-      if (rotation.z !== undefined) scene.rotation.z = rotation.z;
-    }
-  }, [scene]);
+  // 已移除未使用的 transformModel
 
-  useEffect(() => {
-    onTransform && onTransform(transformModel);
-  }, [onTransform, transformModel]);
+  // onTransform 回调不再向外暴露 transformModel，避免类型不匹配的调用
 
   if (loadingError) {
     console.error('Model loading error:', loadingError);
@@ -152,12 +133,12 @@ function Model({ onInfoUpdate, onTransform }: {
         minDistance={5}
         maxDistance={50}
         target={[0, 0, 0]}
-        onChange={(e) => {
-          if (e.target.object instanceof THREE.PerspectiveCamera) {
+        onChange={() => {
+          if (camera instanceof THREE.PerspectiveCamera) {
             onInfoUpdate({
-              position: new Vector3().copy(e.target.object.position),
-              rotation: new Euler().copy(e.target.object.rotation),
-              scale: new Vector3().copy(e.target.object.scale)
+              position: camera.position.clone(),
+              rotation: camera.rotation.clone(),
+              scale: camera.scale.clone(),
             });
           }
         }}
@@ -202,7 +183,7 @@ export function SceneInfo({ onCameraTargetChange }: SceneInfoProps) {
     // onInfoUpdate(modelInfo, cameraInfo); // No longer needed as App doesn't manage cameraInfo
   }, [modelInfo, cameraInfo]); // Removed onInfoUpdate from dependencies
   
-  useFrame((state, delta) => {
+  useFrame((_state, delta) => {
     if (camera instanceof THREE.PerspectiveCamera) {
       // 使用更平滑的缓动函数，减慢插值速度并添加缓动效果
       const rawT = Math.min(delta * 1.2, 1); // 减慢速度从2到1.2
@@ -265,10 +246,7 @@ export function SceneInfo({ onCameraTargetChange }: SceneInfoProps) {
         <OrbitControls />
       </mesh>
     }>
-      <Model 
-        onInfoUpdate={handleModelUpdate}
-        onTransform={() => {}} // onTransform is no longer used by App
-      />
+      <Model onInfoUpdate={handleModelUpdate} />
     </Suspense>
   );
 }

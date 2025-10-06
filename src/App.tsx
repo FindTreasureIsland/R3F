@@ -339,6 +339,10 @@ function App() {
     playView4Animation();
     // No delay between 4 and 5
     playView5Animation();
+    // 跳转到目标地址前等待 5 秒
+    window.setTimeout(() => {
+      window.location.href = "https://findtreasureisland.github.io/blog.html";
+    }, 5000);
   }, [playView4Animation, playView5Animation]);
 
   return (

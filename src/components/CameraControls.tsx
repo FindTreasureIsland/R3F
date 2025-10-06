@@ -30,7 +30,6 @@ export function CameraControls({ position, lookAt, fov, onUpdate }: CameraContro
   }, [position, lookAt, fov]);
 
   const updatePositionFromVector = (distance: number, azimuth: number, elevation: number) => {
-    const newLookAt = lookAt.clone();
     const azimuthRad = azimuth * Math.PI / 180;
     const elevationRad = elevation * Math.PI / 180;
     

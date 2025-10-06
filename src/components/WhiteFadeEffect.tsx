@@ -9,7 +9,7 @@ interface WhiteFadeEffectProps {
 
 export function WhiteFadeEffect({ isActive, onFadeComplete }: WhiteFadeEffectProps) {
   const { scene } = useThree();
-  const fadeRef = useRef<THREE.Mesh>();
+  const fadeRef = useRef<THREE.Mesh | null>(null);
   const startTimeRef = useRef<number>(0);
   const duration = 2000; // 2 seconds in milliseconds
 
