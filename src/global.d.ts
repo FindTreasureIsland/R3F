@@ -1,3 +1,5 @@
+import type { PerspectiveCamera } from "three";
+
 declare global {
   interface Window {
     __updateCamera?: (
@@ -6,7 +8,9 @@ declare global {
     ) => void;
     __updateFog?: (color: string, near: number, far: number) => void;
     __r3f?: {
-      camera: THREE.PerspectiveCamera;
+      camera: PerspectiveCamera;
     };
   }
 }
+
+export {};

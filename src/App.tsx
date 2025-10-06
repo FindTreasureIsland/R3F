@@ -1,13 +1,15 @@
 import * as THREE from "three";
-import { Canvas, useThree, useFrame } from "@react-three/fiber";
+import { Canvas } from "@react-three/fiber";
 import { CameraAnimation } from "./components/CameraAnimation";
-import { OrbitControls, useGLTF } from "@react-three/drei";
+import { useGLTF, OrbitControls } from "@react-three/drei";
 import { WhiteFadeEffect } from "./components/WhiteFadeEffect";
 import { Suspense, useEffect, useRef, useState, useCallback } from "react";
-import { Vector3, Euler, Group, Color, PerspectiveCamera } from "three";
+import { Color, Vector3 } from "three";
 import "./App.css";
-import type { ThreeEvent } from "@react-three/fiber";
 import { SceneInfo } from "./components/SceneInfo";
+// Removed unused imports
+// import type { ThreeEvent } from "@react-three/fiber";
+// import { SceneInfo } from "./components/SceneInfo";
 import { TextOverlay } from "./components/TextOverlay";
 
 // 辅助函数定义
@@ -15,13 +17,7 @@ function lerp(start: number, end: number, t: number): number {
   return start * (1 - t) + end * t;
 }
 
-function lerpVector3(start: Vector3, end: Vector3, t: number): Vector3 {
-  return new Vector3(
-    lerp(start.x, end.x, t),
-    lerp(start.y, end.y, t),
-    lerp(start.z, end.z, t)
-  );
-}
+// Removed unused lerpVector3 helper
 
 useGLTF.preload("/models/spaceship.glb");
 
@@ -65,7 +61,10 @@ function BackgroundMusic() {
   const attemptPlayAudio = async () => {
     if (audioRef.current && isPlaying) {
       try {
+        // Ensure autoplay-friendly start
         audioRef.current.volume = 0;
+        audioRef.current.muted = false;
+        audioRef.current.autoplay = true;
         await audioRef.current.play();
         fadeVolume(0, 0.5, 2000);
         hasAttemptedPlay.current = true;
@@ -114,7 +113,14 @@ function BackgroundMusic() {
   return (
     <>
       {" "}
-      <audio ref={audioRef} src="/backsound.mp3" loop preload="auto" />{" "}
+      <audio
+        ref={audioRef}
+        src="/backsound.mp3"
+        loop
+        preload="auto"
+        autoPlay
+        playsInline
+      />{" "}
       <button
         onClick={() => setIsPlaying(!isPlaying)}
         style={{
@@ -212,10 +218,10 @@ function Lights() {
 
 function App() {
   const [currentViewIndex, setCurrentViewIndex] = useState(0);
-  const [targetPosition, setTargetPosition] = useState(
+  const [targetPosition, setTargetPosition] = useState<Vector3>(
     new Vector3(-6.774, 0.835, 6.782),
   );
-  const [targetLookAt, setTargetLookAt] = useState(new Vector3(0, 0, 7));
+  const [targetLookAt, setTargetLookAt] = useState<Vector3>(new Vector3(0, 0, 7));
   const [fadeActive, setFadeActive] = useState(false);
   const [textOverlayActive, setTextOverlayActive] = useState(false);
   const [showNewButton, setShowNewButton] = useState(false);
@@ -235,10 +241,12 @@ function App() {
     },
   ]);
 
-  const views = useRef([
-    { position: [-6.774, 0.835, 6.782], lookAt: [0, 0, 7] }, // 视角1
-    { position: [-15.683, 3.047, 6.977], lookAt: [0, 0, 0] }, // 视角2
-    { position: [-1.602, -0.267, 13.709], lookAt: [0, 0, 0] }, // 视角3
+  const views = useRef<
+    { position: [number, number, number]; lookAt: [number, number, number] }[]
+  >([
+    { position: [-6.774, 0.835, 6.782] as [number, number, number], lookAt: [0, 0, 7] as [number, number, number] }, // 视角1
+    { position: [-15.683, 3.047, 6.977] as [number, number, number], lookAt: [0, 0, 0] as [number, number, number] }, // 视角2
+    { position: [-1.602, -0.267, 13.709] as [number, number, number], lookAt: [0, 0, 0] as [number, number, number] }, // 视角3
   ]);
 
   useEffect(() => {
@@ -294,31 +302,26 @@ function App() {
 
   const playView4Animation = useCallback(() => {
     if (window.__updateCamera) {
-      const completeUpdate = {
+      const completeUpdate: { position: [number, number, number]; lookAt: [number, number, number] } = {
         position: [0, 0, -6],
         lookAt: [0, 0, -15],
-        midPosition: [0, 0, 13.709],
-        midLookAt: [0, 0, -3],
       };
       window.__updateCamera(
         completeUpdate.position,
         completeUpdate.lookAt,
-        {
-          midPosition: completeUpdate.midPosition,
-          midLookAt: completeUpdate.midLookAt,
-        },
       );
     }
   }, []);
 
   const playView5Animation = useCallback(() => {
-    if (window.__updateFog) {
+    const updateFog = window.__updateFog;
+    if (updateFog) {
       const startTime = Date.now();
       const duration = 5000;
       const animate = () => {
         const elapsed = Date.now() - startTime;
         const progress = Math.min(elapsed / duration, 1);
-        window.__updateFog(
+        updateFog(
           "#ffffff",
           lerp(10, 0, progress),
           lerp(100, 1, progress),
@@ -407,11 +410,11 @@ function App() {
               src="/src/assets/logoicon.png" 
               alt="Logo" 
               style={{
-                width: "36px",
-                height: "36px",
+                width: "32px",
+                height: "32px",
               }}
             />
-            Look4ti，一起寻找金银岛
+            和我们一起，寻找金银岛
           </button>
         </div>
       )}
@@ -474,7 +477,7 @@ function App() {
         />
         <Suspense fallback={null}>
           <SceneInfo
-            onCameraTargetChange={(position, lookAt) => {
+            onCameraTargetChange={(position: Vector3, lookAt: Vector3) => {
               setTargetPosition(position);
               setTargetLookAt(lookAt);
             }}
