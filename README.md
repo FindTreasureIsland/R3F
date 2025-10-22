@@ -1,6 +1,6 @@
 # Entrance Animation for FindTreasureIsland Blog
 
-This repository contains the source code for the cinematic 3D entrance animation for the blog [FindTreasureIsland.github.io](https://findtreasureisland.github.io/blog.html).
+This repository contains the source code for the cinematic 3D entrance animation for the blog [FindTreasureIsland.github.io](https://findtreasureisland.github.io).
 
 ---
 
@@ -58,13 +58,13 @@ This project is a cinematic web experience designed to serve as an immersive ent
 
 ### 🎬 项目简介
 
-本项目是为博客网站 [寻找金银岛](https://findtreasureisland.github.io/blog.html) 精心打造的一个电影质感的 3D 入场动画。它旨在作为博客的沉浸式入口，通过一段自动播放的 3D 场景动画，带领用户体验一场关于探索与发现的视觉叙事，最后将用户引导至博客主页。
+本项目是为博客网站 [寻找金银岛](https://findtreasureisland.github.io) 精心打造的一个电影质感的 3D 入场动画。它旨在作为博客的沉浸式入口，通过一段自动播放的 3D 场景动画，带领用户体验一场关于探索与发现的视觉叙事，最后将用户引导至博客主页。
 
 ### ✨ 功能特性
 
 -   **电影感镜头:** 通过预设的镜头路径，自动播放一段富有故事性的相机动画。
 -   **3D 模型集成:** 加载并展示作为场景核心主题的 `.glb` 格式飞船模型。
--   **叙事文字叠加:** 与镜头动画同步展示打字机效果的动态文字，传达关于坚持与冒险的主题。
+-   **叙事文字叠加:** 与镜头动画同步展示打字机效果的动态文字，传达关于创业感悟的主题。
 -   **背景音乐:** 集成了氛围感十足的背景音乐，并提供了简单的播放/暂停控制按钮。
 -   **无缝跳转:** 动画序列结束后，一个交互按钮将会浮现，点击后触发最终动画并将用户平滑地重定向到博客页面。
 
